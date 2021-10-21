@@ -1,1 +1,85 @@
-<!DOCTYPE html><html lang=""><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><!--[if IE]><link rel="icon" href="favicon.ico" /><![endif]--><title>田长制平台</title><script src="http://www.ituzhi.com:8082/sdk/js_map_api/api/init.js"></script><link href="css/chunk-0eb2e8d8.d72d1f99.css" rel="prefetch"><link href="css/chunk-102855e0.42c39387.css" rel="prefetch"><link href="css/chunk-1265bf36.0dbf2783.css" rel="prefetch"><link href="css/chunk-1becbd34.9942693a.css" rel="prefetch"><link href="css/chunk-29abdfd6.d3f5eaa0.css" rel="prefetch"><link href="css/chunk-3fde64ad.104feac2.css" rel="prefetch"><link href="css/chunk-44c8d32c.3a8f70ea.css" rel="prefetch"><link href="css/chunk-544f7726.1c431ceb.css" rel="prefetch"><link href="css/chunk-5dc6fe23.13ae01d6.css" rel="prefetch"><link href="css/chunk-5fae11a4.545be68c.css" rel="prefetch"><link href="css/chunk-7d802522.a9ed8346.css" rel="prefetch"><link href="js/chunk-0eb2e8d8.ecdce795.js" rel="prefetch"><link href="js/chunk-102855e0.3d13d530.js" rel="prefetch"><link href="js/chunk-1265bf36.3345fdb9.js" rel="prefetch"><link href="js/chunk-1becbd34.f5a5830c.js" rel="prefetch"><link href="js/chunk-29abdfd6.4590ba8e.js" rel="prefetch"><link href="js/chunk-3fde64ad.224d1daf.js" rel="prefetch"><link href="js/chunk-44c8d32c.cb30ad38.js" rel="prefetch"><link href="js/chunk-544f7726.7cf8bc67.js" rel="prefetch"><link href="js/chunk-5c2c1a87.fab7461b.js" rel="prefetch"><link href="js/chunk-5dc6fe23.70f3d364.js" rel="prefetch"><link href="js/chunk-5fae11a4.59e212a9.js" rel="prefetch"><link href="js/chunk-7d802522.5da122bd.js" rel="prefetch"><link href="css/app.87a99731.css" rel="preload" as="style"><link href="css/chunk-vendors.1aa89c59.css" rel="preload" as="style"><link href="js/app.cab095c9.js" rel="preload" as="script"><link href="js/chunk-vendors.38d51e9e.js" rel="preload" as="script"><link href="css/chunk-vendors.1aa89c59.css" rel="stylesheet"><link href="css/app.87a99731.css" rel="stylesheet"><link rel="icon" type="image/png" sizes="32x32" href="img/icons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="img/icons/favicon-16x16.png"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#65d4ff"><meta name="apple-mobile-web-app-capable" content="no"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="田长制平台"><link rel="apple-touch-icon" href="img/icons/apple-touch-icon-152x152.png"><link rel="mask-icon" href="img/icons/safari-pinned-tab.svg" color="#65d4ff"><meta name="msapplication-TileImage" content="img/icons/msapplication-icon-144x144.png"><meta name="msapplication-TileColor" content="#65d4ff"></head><body><noscript><strong>We're sorry but ituzhi_TianZhangZhi_wap doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="app"><script src="js/chunk-vendors.38d51e9e.js"></script><script src="js/app.cab095c9.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
+    <meta http-equiv="expires" content="0" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>H5定位测试</title>
+    <script
+      type="text/javascript"
+      src="https://api.tianditu.gov.cn/api?v=4.0&tk=8daa2c2e245d6a84234ab7c48b1ad121"
+    ></script>
+  </head>
+  <body onload="initMap()" style="height: 100%; margin: 0">
+    <div id="mapDiv" style="height: 100%"></div>
+    <div
+      style="
+        position: absolute;
+        bottom: 30px;
+        z-index: 999;
+        left: calc(50% - 70px);
+      "
+    >
+      <button onclick="startLocation()">开始定位</button>
+      <button onclick="stopLocation()">结束定位</button>
+    </div>
+    <script>
+      let watchId = "";
+      let locations = [];
+      let map;
+
+      function initMap() {
+        map = new T.Map("mapDiv");
+        map.centerAndZoom(new T.LngLat(116.40769, 39.89945), 18);
+      }
+
+      function startLocation() {
+        if ("geolocation" in navigator && !watchId) {
+          /* 地理位置服务可用 */
+          watchId = navigator.geolocation.watchPosition(
+            (position) => {
+              map.clearOverLays();
+
+              let location = new T.LngLat(
+                position.coords.longitude,
+                position.coords.latitude
+              );
+              map.centerAndZoom(location, 18); //创建标注对象
+              let marker = new T.Marker(location);
+              //向地图上添加标注
+              map.addOverLay(marker);
+
+              locations.push(location);
+              //创建线对象
+              var line = new T.Polyline(locations);
+              //向地图上添加线
+              map.addOverLay(line);
+            },
+            (error) => {
+              let msg = "获取地理位置超时";
+              switch (error.code) {
+                case 1:
+                  msg = "没有获取地理位置信息的权限";
+                  break;
+                case 2:
+                  msg = "获取地理位置出错";
+                  break;
+              }
+              alert(msg);
+            },
+            { enableHighAccuracy: true, timeout: 1000 * 30, maximumAge: 0 }
+          );
+        }
+      }
+
+      function stopLocation() {
+        navigator.geolocation.clearWatch(watchId);
+        map.clearOverLays();
+        watchId = "";
+        locations = [];
+      }
+    </script>
+  </body>
+</html>
